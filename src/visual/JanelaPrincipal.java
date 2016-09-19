@@ -5,7 +5,9 @@
  */
 package visual;
 
-import java.awt.Frame;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
@@ -17,6 +19,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private int quantPaginas = 0;
     private int quantMolduras = 0;
     private String simular = "";
+    private JLabel tempo;
+    private JTable tabela;
+    private JTable molduras;
+    private long timerStart;
 
     public int getQuantPaginas() {
         return quantPaginas;
@@ -40,6 +46,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     public JanelaPrincipal() {
         initComponents();
         this.setExtendedState(this.MAXIMIZED_BOTH);
+        
     }
 
     /**
@@ -125,10 +132,20 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     }
     
     public void segundaChance(){
-        JTable tabela = criarTabela();
+        timerStart = System.currentTimeMillis();
+        tempo = new JLabel("Tempo: " + (System.currentTimeMillis() - timerStart)/1000);
+        Timer t = new Timer();
+        jPanel1.add(tempo);
+        t.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                tempo.setText("Tempo: " + (System.currentTimeMillis() - timerStart)/1000);
+            }
+        }, 1000, 1000);
+        tabela = criarTabela();
         JScrollPane tabelaScrollPane = new JScrollPane(tabela);
         jPanel1.add(tabelaScrollPane);
-        JTable molduras = criarMolduras();
+        molduras = criarMolduras();
         JScrollPane moldurasScrollPane = new JScrollPane(molduras);
         jPanel1.add(moldurasScrollPane);
         this.pack();
