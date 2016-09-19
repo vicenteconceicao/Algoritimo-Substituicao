@@ -7,8 +7,6 @@ package sistemasoperacionais;
 
 import SubstituicaoPagina.Pagina;
 import SubstituicaoPagina.WSClock;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
  *
