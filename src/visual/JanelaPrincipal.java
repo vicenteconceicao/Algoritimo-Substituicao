@@ -58,14 +58,19 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        painelBotoes = new javax.swing.JPanel();
+        painelRelogio = new javax.swing.JPanel();
+        painelConteudo = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Algoritmos de Substituição de Páginas");
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        setMinimumSize(new java.awt.Dimension(800, 600));
+        getContentPane().add(painelBotoes, java.awt.BorderLayout.PAGE_END);
+        getContentPane().add(painelRelogio, java.awt.BorderLayout.PAGE_START);
+        getContentPane().add(painelConteudo, java.awt.BorderLayout.CENTER);
 
         jMenu4.setText("Simulações");
 
@@ -128,10 +133,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     
     //Cria as tabelas de páginas e de molduras
     public void inicializarMetodo(){
+        
         timerStart = System.currentTimeMillis();//Inicia relógio
         tempo = new JLabel("Tempo: " + (System.currentTimeMillis() - timerStart)/1000);//Label para mostrar o relógio
         Timer t = new Timer();
-        jPanel1.add(tempo);
+        painelRelogio.add(tempo);
         //Atualiza o relógio visualmente a cada segundo
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -141,10 +147,10 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }, 1000, 1000);
         tabela = criarTabela();
         JScrollPane tabelaScrollPane = new JScrollPane(tabela);
-        jPanel1.add(tabelaScrollPane);
+        painelConteudo.add(tabelaScrollPane);
         molduras = criarMolduras();
         JScrollPane moldurasScrollPane = new JScrollPane(molduras);
-        jPanel1.add(moldurasScrollPane);
+        painelConteudo.add(moldurasScrollPane);
         this.pack();
     }
     //Escrever algoritmo de substuição segunda chance
@@ -181,6 +187,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel painelBotoes;
+    private javax.swing.JPanel painelConteudo;
+    private javax.swing.JPanel painelRelogio;
     // End of variables declaration//GEN-END:variables
 }
