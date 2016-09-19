@@ -126,16 +126,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         });
     }
     
+    //Cria as tabelas de páginas e de molduras
     public void inicializarMetodo(){
-        if (this.simular.contains("segundachance"))
-            segundaChance();
-    }
-    
-    public void segundaChance(){
-        timerStart = System.currentTimeMillis();
-        tempo = new JLabel("Tempo: " + (System.currentTimeMillis() - timerStart)/1000);
+        timerStart = System.currentTimeMillis();//Inicia relógio
+        tempo = new JLabel("Tempo: " + (System.currentTimeMillis() - timerStart)/1000);//Label para mostrar o relógio
         Timer t = new Timer();
         jPanel1.add(tempo);
+        //Atualiza o relógio visualmente a cada segundo
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -149,6 +146,15 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         JScrollPane moldurasScrollPane = new JScrollPane(molduras);
         jPanel1.add(moldurasScrollPane);
         this.pack();
+    }
+    //Escrever algoritmo de substuição segunda chance
+    public void segundaChance(){
+        
+    }
+    
+    //Escrever algoritmo de substuição WSclock
+    public void wsClock(){
+        
     }
     
     public JTable criarTabela(){
