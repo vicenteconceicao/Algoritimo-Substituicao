@@ -37,6 +37,8 @@ public class Propriedades extends javax.swing.JDialog {
         jFormattedTextField1 = new javax.swing.JFormattedTextField();
         jLabel3 = new javax.swing.JLabel();
         jFormattedTextField2 = new javax.swing.JFormattedTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jFormattedTextField3 = new javax.swing.JFormattedTextField();
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -51,6 +53,10 @@ public class Propriedades extends javax.swing.JDialog {
         jLabel3.setText("Quantidade de Molduras");
         getContentPane().add(jLabel3);
         getContentPane().add(jFormattedTextField2);
+
+        jLabel4.setText("Intervalo do relogio (segundos)");
+        getContentPane().add(jLabel4);
+        getContentPane().add(jFormattedTextField3);
 
         jButton1.setText("Confirmar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -67,6 +73,7 @@ public class Propriedades extends javax.swing.JDialog {
         // TODO add your handling code here:
         janelaPrincipal.setQuantPaginas(Integer.valueOf(jFormattedTextField1.getText()));
         janelaPrincipal.setQuantMolduras(Integer.valueOf(jFormattedTextField2.getText()));
+        janelaPrincipal.setIntervaloRelogio(Integer.valueOf(jFormattedTextField3.getText()));
         janelaPrincipal.inicializarMetodo();
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -122,7 +129,9 @@ public class Propriedades extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JFormattedTextField jFormattedTextField2;
+    private javax.swing.JFormattedTextField jFormattedTextField3;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     // End of variables declaration//GEN-END:variables
 }
