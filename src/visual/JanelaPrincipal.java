@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -87,6 +88,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
         botaoSegundaChance = new javax.swing.JMenuItem();
         botaoFifo = new javax.swing.JMenuItem();
+        botaoLru = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Algoritmos de Substituição de Páginas");
@@ -114,6 +116,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         });
         jMenu4.add(botaoFifo);
 
+        botaoLru.setText("Least Recently Used");
+        botaoLru.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoLruActionPerformed(evt);
+            }
+        });
+        jMenu4.add(botaoLru);
+
         jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
@@ -134,6 +144,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         Propriedades prop = new Propriedades(this, rootPaneCheckingEnabled);
         prop.executar(this);
     }//GEN-LAST:event_botaoFifoActionPerformed
+
+    private void botaoLruActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoLruActionPerformed
+        // TODO add your handling code here:
+        this.simular = "lru";
+        Propriedades prop = new Propriedades(this, rootPaneCheckingEnabled);
+        prop.executar(this);
+    }//GEN-LAST:event_botaoLruActionPerformed
 
     /**
      * @param args the command line arguments
@@ -186,6 +203,8 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     segundaChance();
                 else if (simular.contains("fifo"))
                     fifo();
+                else if (simular.contains("lru"))
+                    lru();
             }
         });
         botaoModificar = new JButton("Modificar");
@@ -318,6 +337,51 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         }
     }
     
+    public void lru(){
+        int linhaTabela = tabela.getSelectedRow();
+        int paginaAnterior = -1;
+        int frameAnterior = -1;
+        if (linhaTabela != -1){
+            int pagina = (int)tabela.getModel().getValueAt(linhaTabela, 0);
+            if (fila.contains(new Frame(0, listaPaginas.get(pagina)))){//pagina já está na moldura
+                listaPaginas.get(pagina).setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
+                listaPaginas.get(pagina).setBitR(1);
+                for (Iterator<Frame> iterator = fila.iterator(); iterator.hasNext();) {
+                    Frame f = iterator.next();
+                    if (f.getPage().getPagina() == pagina){
+                        fila.remove(f);
+                        fila.addLast(f);
+                        break;
+                    }
+                }
+            }
+            else{
+                if (fila.isEmpty() || fila.size() < quantMolduras){//Molduras vazias ou tem espaço 
+                    Frame f = new Frame(fila.size(), listaPaginas.get(pagina));
+                    f.getPage().setBitR(1);
+                    f.getPage().setTempoCarregado((System.currentTimeMillis() - timerStart)/1000);
+                    f.getPage().setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
+                    fila.addLast(f);
+                    listaMolduras.get(f.getMoldura()).setPage(f.getPage());
+                }
+                else{
+                    Frame f = fila.poll();
+                    Frame f2 = new Frame(f.getMoldura(), listaPaginas.get(pagina));
+                    f2.getPage().setBitR(1);
+                    f2.getPage().setTempoCarregado((System.currentTimeMillis() - timerStart)/1000);
+                    f2.getPage().setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
+                    paginaAnterior = f.getPage().getPagina();
+                    frameAnterior = f.getMoldura();
+                    f.getPage().setBitM(0);
+                    fila.addLast(f2);
+                    listaMolduras.get(f2.getMoldura()).setPage(f2.getPage());
+                }
+            }
+            atualizarTabela();
+            atualizarMolduras(frameAnterior, paginaAnterior);
+        }
+    }
+    
     //Escrever algoritmo de substuição WSclock
     public void wsClock(){
         
@@ -340,6 +404,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 return false;
             }
         });
+        tab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabela = tab;
         
         JScrollPane tabelaScrollPane = new JScrollPane(tab);
@@ -360,6 +425,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 return false;
             }
         });
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
     
     public void criarMolduras(){
@@ -379,6 +445,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 return false;
             }
         });
+        tab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         molduras = tab;
         JScrollPane moldurasScrollPane = new JScrollPane(tab);
         painelConteudo.add(moldurasScrollPane);
@@ -405,10 +472,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 return false;
             }
         });
+        molduras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem botaoFifo;
+    private javax.swing.JMenuItem botaoLru;
     private javax.swing.JMenuItem botaoSegundaChance;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
