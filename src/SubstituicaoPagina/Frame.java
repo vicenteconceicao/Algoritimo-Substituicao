@@ -40,7 +40,7 @@ public class Frame {
     @Override
     public boolean equals(Object obj) {
         Frame f = (Frame) obj;
-        if (f.getPage().equals(getPage()))
+        if (f.getPage() != null && f.getPage().equals(getPage()))
             return true;
         return false;
     }

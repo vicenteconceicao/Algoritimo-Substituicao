@@ -39,7 +39,7 @@ public class Propriedades extends javax.swing.JDialog {
         jFormattedTextField2 = new javax.swing.JFormattedTextField();
         jLabel4 = new javax.swing.JLabel();
         jFormattedTextField3 = new javax.swing.JFormattedTextField();
-        jButton1 = new javax.swing.JButton();
+        botaoConfirmar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Insira as propriedades para simulação");
@@ -58,25 +58,25 @@ public class Propriedades extends javax.swing.JDialog {
         getContentPane().add(jLabel4);
         getContentPane().add(jFormattedTextField3);
 
-        jButton1.setText("Confirmar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        botaoConfirmar.setText("Confirmar");
+        botaoConfirmar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                botaoConfirmarActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1);
+        getContentPane().add(botaoConfirmar);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void botaoConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConfirmarActionPerformed
         // TODO add your handling code here:
         janelaPrincipal.setQuantPaginas(Integer.valueOf(jFormattedTextField1.getText()));
         janelaPrincipal.setQuantMolduras(Integer.valueOf(jFormattedTextField2.getText()));
         janelaPrincipal.setIntervaloRelogio(Integer.valueOf(jFormattedTextField3.getText()));
         janelaPrincipal.inicializarMetodo();
         this.dispose();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_botaoConfirmarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -126,7 +126,7 @@ public class Propriedades extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton botaoConfirmar;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JFormattedTextField jFormattedTextField2;
     private javax.swing.JFormattedTextField jFormattedTextField3;

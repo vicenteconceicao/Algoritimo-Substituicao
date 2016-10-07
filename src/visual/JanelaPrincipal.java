@@ -7,6 +7,7 @@ package visual;
 
 import SubstituicaoPagina.Frame;
 import SubstituicaoPagina.Page;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayDeque;
@@ -35,10 +36,11 @@ public class JanelaPrincipal extends javax.swing.JFrame {
     private ArrayList<Page> listaPaginas;
     private ArrayList<Frame> listaMolduras;
     private long timerStart;
-    private JButton botaoCarregar;
+    private JButton botaoLer;
     private JButton botaoModificar;
     private ArrayDeque<Frame> fila = new ArrayDeque<>();
-    private int intervaloRelogio = 5;
+    private int intervaloRelogio = 10;
+    private Timer t;
 
     public int getIntervaloRelogio() {
         return intervaloRelogio;
@@ -84,11 +86,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
 
         painelBotoes = new javax.swing.JPanel();
         painelConteudo = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu4 = new javax.swing.JMenu();
         botaoSegundaChance = new javax.swing.JMenuItem();
         botaoFifo = new javax.swing.JMenuItem();
         botaoLru = new javax.swing.JMenuItem();
+        botaoNRU = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Algoritmos de Substituição de Páginas");
@@ -96,11 +100,17 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         getContentPane().add(painelBotoes, java.awt.BorderLayout.PAGE_START);
 
         painelConteudo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        jLabel1.setFont(new java.awt.Font("FreeSans", 0, 36)); // NOI18N
+        jLabel1.setText("Algoritmos de Substituição de Páginas");
+        jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        painelConteudo.add(jLabel1);
+
         getContentPane().add(painelConteudo, java.awt.BorderLayout.CENTER);
 
         jMenu4.setText("Simulações");
 
-        botaoSegundaChance.setText("Segunda chance");
+        botaoSegundaChance.setText("Second Chance");
         botaoSegundaChance.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botaoSegundaChanceActionPerformed(evt);
@@ -123,6 +133,14 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             }
         });
         jMenu4.add(botaoLru);
+
+        botaoNRU.setText("Not Recently Used");
+        botaoNRU.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoNRUActionPerformed(evt);
+            }
+        });
+        jMenu4.add(botaoNRU);
 
         jMenuBar1.add(jMenu4);
 
@@ -151,6 +169,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         Propriedades prop = new Propriedades(this, rootPaneCheckingEnabled);
         prop.executar(this);
     }//GEN-LAST:event_botaoLruActionPerformed
+
+    private void botaoNRUActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoNRUActionPerformed
+        // TODO add your handling code here:
+        this.simular = "nru";
+        Propriedades prop = new Propriedades(this, rootPaneCheckingEnabled);
+        prop.executar(this);
+    }//GEN-LAST:event_botaoNRUActionPerformed
 
     /**
      * @param args the command line arguments
@@ -193,10 +218,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         painelBotoes.removeAll();
         painelConteudo.removeAll();
         fila = new ArrayDeque<>();
+        if (t != null){
+            t.cancel();
+        }
         //fim limpar
         
-        botaoCarregar = new JButton("Ler");
-        botaoCarregar.addActionListener(new ActionListener() {
+        botaoLer = new JButton("Ler");
+        botaoLer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (simular.contains("segundachance"))
@@ -205,29 +233,32 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     fifo();
                 else if (simular.contains("lru"))
                     lru();
+                else if (simular.contains("nru"))
+                    nru();
             }
         });
         botaoModificar = new JButton("Modificar");
         botaoModificar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int selecionada = molduras.getSelectedRow();
-                if (selecionada != -1){
-                    listaMolduras.get(selecionada).getPage().setBitR(1);
-                    listaMolduras.get(selecionada).getPage().setBitM(1);
-                    atualizarTabela();
+                int selecionada = tabela.getSelectedRow();
+                if (selecionada != -1 && listaMolduras.contains(new Frame(0, listaPaginas.get(selecionada)))){
+                    listaPaginas.get(selecionada).setBitR(1);
+                    listaPaginas.get(selecionada).setBitM(1);
+                    listaPaginas.get(selecionada).setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
+                    atualizarTabela("modificar");
                 }
             }
         });
         
-        painelBotoes.add(botaoCarregar);
+        painelBotoes.add(botaoLer);
         painelBotoes.add(botaoModificar);
         timerStart = System.currentTimeMillis();//Inicia relógio
         tempo = new JLabel("Tempo: " + (System.currentTimeMillis() - timerStart)/1000);//Label para mostrar o relógio
         
         painelBotoes.add(tempo);
         //Atualiza o relógio visualmente a cada segundo
-        Timer t = new Timer();
+        t = new Timer();
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -239,21 +270,20 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             public void run() {
                 if (tabela != null && !listaPaginas.isEmpty()){
                     for (Page p : listaPaginas){
-                        p.setBitR(0);
+                        if (((System.currentTimeMillis() - timerStart)/1000) - p.getTempoUltimaRef() >= intervaloRelogio)
+                            p.setBitR(0);
                     }
-                    atualizarTabela();
+                    atualizarTabela("relogio");
                 }
             }
-        }, intervaloRelogio*1000, intervaloRelogio*1000);
+        }, 1000, 1000);
         criarTabela();
         criarMolduras();
         this.pack();
     }
-    //Escrever algoritmo de substuição segunda chance
+    //algoritmo de substuição segunda chance
     public void segundaChance(){
         int linhaTabela = tabela.getSelectedRow();
-        int paginaAnterior = -1;
-        int frameAnterior = -1;
         if (linhaTabela != -1){
             int pagina = (int)tabela.getModel().getValueAt(linhaTabela, 0);
             if (fila.contains(new Frame(0, listaPaginas.get(pagina)))){//pagina já está na moldura
@@ -282,11 +312,9 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                                 f2.getPage().setBitR(1);
                                 f2.getPage().setTempoCarregado((System.currentTimeMillis() - timerStart)/1000);
                                 f2.getPage().setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
-                                paginaAnterior = f.getPage().getPagina();
-                                frameAnterior = f.getMoldura();
                                 f.getPage().setBitM(0);
                                 fila.remove(f);
-                                fila.addLast(f2);
+                                fila.addLast(f2);//coloca no final da lista
                                 listaMolduras.get(f2.getMoldura()).setPage(f2.getPage());
                                 substituiu = true;
                                 break;
@@ -295,15 +323,12 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     }
                 }
             }
-            atualizarTabela();
-            atualizarMolduras(frameAnterior, paginaAnterior);
+            atualizarTabela("ler");
         }
     }
     
     public void fifo(){
         int linhaTabela = tabela.getSelectedRow();
-        int paginaAnterior = -1;
-        int frameAnterior = -1;
         if (linhaTabela != -1){
             int pagina = (int)tabela.getModel().getValueAt(linhaTabela, 0);
             if (fila.contains(new Frame(0, listaPaginas.get(pagina)))){//pagina já está na moldura
@@ -325,22 +350,17 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     f2.getPage().setBitR(1);
                     f2.getPage().setTempoCarregado((System.currentTimeMillis() - timerStart)/1000);
                     f2.getPage().setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
-                    paginaAnterior = f.getPage().getPagina();
-                    frameAnterior = f.getMoldura();
                     f.getPage().setBitM(0);
                     fila.addLast(f2);
                     listaMolduras.get(f2.getMoldura()).setPage(f2.getPage());
                 }
             }
-            atualizarTabela();
-            atualizarMolduras(frameAnterior, paginaAnterior);
+            atualizarTabela("ler");
         }
     }
     
     public void lru(){
         int linhaTabela = tabela.getSelectedRow();
-        int paginaAnterior = -1;
-        int frameAnterior = -1;
         if (linhaTabela != -1){
             int pagina = (int)tabela.getModel().getValueAt(linhaTabela, 0);
             if (fila.contains(new Frame(0, listaPaginas.get(pagina)))){//pagina já está na moldura
@@ -370,31 +390,80 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     f2.getPage().setBitR(1);
                     f2.getPage().setTempoCarregado((System.currentTimeMillis() - timerStart)/1000);
                     f2.getPage().setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
-                    paginaAnterior = f.getPage().getPagina();
-                    frameAnterior = f.getMoldura();
                     f.getPage().setBitM(0);
                     fila.addLast(f2);
                     listaMolduras.get(f2.getMoldura()).setPage(f2.getPage());
                 }
             }
-            atualizarTabela();
-            atualizarMolduras(frameAnterior, paginaAnterior);
+            atualizarTabela("ler");
         }
     }
     
-    //Escrever algoritmo de substuição WSclock
-    public void wsClock(){
-        
+    //Escrever algoritmo de substuição NRU
+    public void nru(){
+        int linhaTabela = tabela.getSelectedRow();
+        if (linhaTabela != -1){
+            int pagina = (int)tabela.getModel().getValueAt(linhaTabela, 0);
+            if (fila.contains(new Frame(0, listaPaginas.get(pagina)))){//pagina já está na moldura
+                listaPaginas.get(pagina).setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
+                listaPaginas.get(pagina).setBitR(1);
+            }
+            else{
+                if (fila.isEmpty() || fila.size() < quantMolduras){//Molduras vazias ou tem espaço 
+                    Frame f = new Frame(fila.size(), listaPaginas.get(pagina));
+                    f.getPage().setBitR(1);
+                    f.getPage().setTempoCarregado((System.currentTimeMillis() - timerStart)/1000);
+                    f.getPage().setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
+                    fila.addLast(f);
+                    listaMolduras.get(f.getMoldura()).setPage(f.getPage());
+                }
+                else{
+                    Frame fMenor = null;
+                    int menor = 3;
+                    for (Frame f : listaMolduras) {
+                        int atual = 3;
+                        if (f.getPage().getBitR() == 0 && f.getPage().getBitM() == 0){
+                            atual = 0;
+                        }
+                        else if (f.getPage().getBitR() == 0 && f.getPage().getBitM() == 1){
+                            atual = 1;
+                        }
+                        else if (f.getPage().getBitR() == 1 && f.getPage().getBitM() == 0){
+                            atual = 2;
+                        }
+                        else if (f.getPage().getBitR() == 1 && f.getPage().getBitM() == 1){
+                            atual = 3;
+                        }
+                        
+                        if (atual <= menor){
+                            menor = atual;
+                            fMenor = f;
+                        }
+                    }
+                    
+                    Frame f2 = new Frame(fMenor.getMoldura(), listaPaginas.get(pagina));
+                    f2.getPage().setBitR(1);
+                    f2.getPage().setTempoCarregado((System.currentTimeMillis() - timerStart)/1000);
+                    f2.getPage().setTempoUltimaRef((System.currentTimeMillis() - timerStart)/1000);
+                    fMenor.getPage().setBitM(0);
+                    fila.remove(fMenor);
+                    fila.addLast(f2);//coloca no final da lista
+                    listaMolduras.get(f2.getMoldura()).setPage(f2.getPage());
+                    
+                }
+            }
+            atualizarTabela("ler");
+        }
     }
     
     public void criarTabela(){
-        String colunas[] = {"Pagina", "Tempo Carregado", "Tempo Ultima Ref.", "R", "M"};
+        String colunas[] = {"Pagina", "Tempo Carregado", "Tempo Ultima Ref.", "R", "M", "Moldura"};
         listaPaginas = new ArrayList<>();
         Object dados[][] = new Object[quantPaginas][5];
         for (int i = 0; i < quantPaginas; i++){
-            Page p = new Page(i, 0, 0, 0, 0);
+            Page p = new Page(i, 0, 0, 0, 0, "");
             listaPaginas.add(p);
-            Object obj[] = {p.getPagina(), p.getTempoCarregado(), p.getTempoUltimaRef(), p.getBitR(), p.getBitM()};
+            Object obj[] = {p.getPagina(), p.getTempoCarregado(), p.getTempoUltimaRef(), p.getBitR(), p.getBitM(), p.getHistory()};
             dados[i] = obj;
         }
         JTable tab = new JTable();
@@ -406,79 +475,88 @@ public class JanelaPrincipal extends javax.swing.JFrame {
         });
         tab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabela = tab;
-        
+        tabela.getColumnModel().getColumn(5).setMinWidth(600);
         JScrollPane tabelaScrollPane = new JScrollPane(tab);
+        tabelaScrollPane.setPreferredSize(new Dimension(1024, 600));
         painelConteudo.add(tabelaScrollPane);
     }
     
-    public void atualizarTabela(){
-        String colunas[] = {"Pagina", "Tempo Carregado", "Tempo Ultima Ref.", "R", "M"};
-        Object dados[][] = new Object[quantPaginas][5];
+    public void atualizarTabela(String quemChamou){
         for (int i = 0; i < quantPaginas; i++){
             Page p = listaPaginas.get(i);
-            Object obj[] = {p.getPagina(), p.getTempoCarregado(), p.getTempoUltimaRef(), p.getBitR(), p.getBitM()};
-            dados[i] = obj;
-        }
-        tabela.setModel(new DefaultTableModel(dados, colunas){//Define que as células não são editáveis
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
+            if (quemChamou.contains("ler")){
+                boolean tinha = false;
+                for (Frame f : listaMolduras){
+                    if (f.equals(new Frame(0, p))){
+                        tinha = true;
+                        p.setHistory(p.getHistory() + f.getMoldura() + "->");
+                    }
+                }
+                if (!tinha){
+                    p.setHistory(p.getHistory() + "X->");
+                }
             }
-        });
-        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            tabela.getModel().setValueAt(p.getTempoCarregado(), i, 1);
+            tabela.getModel().setValueAt(p.getTempoUltimaRef(), i, 2);
+            tabela.getModel().setValueAt(p.getBitR(), i, 3);
+            tabela.getModel().setValueAt(p.getBitM(), i, 4);
+            tabela.getModel().setValueAt(p.getHistory(), i, 5);
+        }
     }
     
     public void criarMolduras(){
-        String colunas[] = {"Moldura", "Pagina"};
+//        String colunas[] = {"Moldura", "Pagina"};
         listaMolduras = new ArrayList<>();
-        Object dados[][] = new Object[quantMolduras][2];
+//        Object dados[][] = new Object[quantMolduras][2];
         for (int i = 0; i < quantMolduras; i++){
             Frame f = new Frame(i, null);
             listaMolduras.add(f);
-            Object obj[] = {f.getMoldura(), f.getPage()};
-            dados[i] = obj;
+//            Object obj[] = {f.getMoldura(), f.getPage()};
+//            dados[i] = obj;
         }
-        JTable tab = new JTable();
-        tab.setModel(new DefaultTableModel(dados, colunas){//Define que as células não são editáveis
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        });
-        tab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        molduras = tab;
-        JScrollPane moldurasScrollPane = new JScrollPane(tab);
-        painelConteudo.add(moldurasScrollPane);
+//        JTable tab = new JTable();
+//        tab.setModel(new DefaultTableModel(dados, colunas){//Define que as células não são editáveis
+//            @Override
+//            public boolean isCellEditable(int row, int column) {
+//                return false;
+//            }
+//        });
+//        tab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        molduras = tab;
+//        JScrollPane moldurasScrollPane = new JScrollPane(tab);
+//        painelConteudo.add(moldurasScrollPane);
     }
-    
-    public void atualizarMolduras(int frameAnterior, int paginaAnterior){
-        String colunas[] = {"Moldura", "Pagina"};
-        Object dados[][] = new Object[quantMolduras][2];
-        for (int i = 0; i < quantMolduras; i++){
-            Frame f = listaMolduras.get(i);
-            if (frameAnterior != -1 && paginaAnterior != -1 && frameAnterior == i){
-                Object obj[] = {f.getMoldura(), paginaAnterior + "-->" + f.getPage()};
-                dados[i] = obj;
-            }
-            else{
-                Object obj[] = {f.getMoldura(), f.getPage()};
-                dados[i] = obj;
-            }
-            
-        }
-        molduras.setModel(new DefaultTableModel(dados, colunas){//Define que as células não são editáveis
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        });
-        molduras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    }
+//    
+//    public void atualizarMolduras(int frameAnterior, int paginaAnterior){
+//        String colunas[] = {"Moldura", "Pagina"};
+//        Object dados[][] = new Object[quantMolduras][2];
+//        for (int i = 0; i < quantMolduras; i++){
+//            Frame f = listaMolduras.get(i);
+//            if (frameAnterior != -1 && paginaAnterior != -1 && frameAnterior == i){
+//                Object obj[] = {f.getMoldura(), paginaAnterior + "-->" + f.getPage()};
+//                dados[i] = obj;
+//            }
+//            else{
+//                Object obj[] = {f.getMoldura(), f.getPage()};
+//                dados[i] = obj;
+//            }
+//            
+//        }
+//        molduras.setModel(new DefaultTableModel(dados, colunas){//Define que as células não são editáveis
+//            @Override
+//            public boolean isCellEditable(int row, int column) {
+//                return false;
+//            }
+//        });
+//        molduras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem botaoFifo;
     private javax.swing.JMenuItem botaoLru;
+    private javax.swing.JMenuItem botaoNRU;
     private javax.swing.JMenuItem botaoSegundaChance;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel painelBotoes;

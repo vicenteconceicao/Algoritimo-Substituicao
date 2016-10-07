@@ -5,6 +5,8 @@
  */
 package SubstituicaoPagina;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author horgun
@@ -15,16 +17,18 @@ public class Page {
     private long tempoUltimaRef;
     private int bitR;
     private int bitM;
-
+    private String history;
+    
     public Page(){
     }
     
-    public Page(int pagina, int tempoCarregado, int tempoUltimaRef, int bitR, int bitM) {
+    public Page(int pagina, int tempoCarregado, int tempoUltimaRef, int bitR, int bitM, String history) {
         this.pagina = pagina;
         this.tempoCarregado = tempoCarregado;
         this.tempoUltimaRef = tempoUltimaRef;
         this.bitR = bitR;
         this.bitM = bitM;
+        this.history = history;
     }
 
     public int getPagina() {
@@ -65,6 +69,14 @@ public class Page {
 
     public void setBitM(int bitM) {
         this.bitM = bitM;
+    }
+
+    public String getHistory() {
+        return history;
+    }
+
+    public void setHistory(String history) {
+        this.history = history;
     }
 
     @Override
