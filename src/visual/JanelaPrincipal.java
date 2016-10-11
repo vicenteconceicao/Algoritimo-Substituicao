@@ -7,6 +7,7 @@ package visual;
 
 import SubstituicaoPagina.Frame;
 import SubstituicaoPagina.Page;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -250,7 +251,16 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 }
             }
         });
-        
+        JLabel titulo = new JLabel();
+        if (this.simular.contains("segundachance"))
+            titulo.setText("Segunda Change");
+        else if (this.simular.contains("fifo"))
+            titulo.setText("First In First Out");
+        else if (this.simular.contains("lru"))
+            titulo.setText("Least Recently Used");
+        else if (this.simular.contains("nru"))
+            titulo.setText("Not Recently Used");
+        painelBotoes.add(titulo);
         painelBotoes.add(botaoLer);
         painelBotoes.add(botaoModificar);
         timerStart = System.currentTimeMillis();//Inicia relógio
@@ -489,11 +499,13 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                 for (Frame f : listaMolduras){
                     if (f.equals(new Frame(0, p))){
                         tinha = true;
-                        p.setHistory(p.getHistory() + f.getMoldura() + "->");
+                        p.setHistory(p.getHistory().replaceAll("\\[", "").replaceAll("\\]", ""));
+                        p.setHistory(p.getHistory() + "[" + f.getMoldura() + "]->");
                     }
                 }
                 if (!tinha){
-                    p.setHistory(p.getHistory() + "X->");
+                    p.setHistory(p.getHistory().replaceAll("\\[", "").replaceAll("\\]", ""));
+                    p.setHistory(p.getHistory() + "[X]->");
                 }
             }
             tabela.getModel().setValueAt(p.getTempoCarregado(), i, 1);
@@ -501,6 +513,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             tabela.getModel().setValueAt(p.getBitR(), i, 3);
             tabela.getModel().setValueAt(p.getBitM(), i, 4);
             tabela.getModel().setValueAt(p.getHistory(), i, 5);
+            
         }
     }
     

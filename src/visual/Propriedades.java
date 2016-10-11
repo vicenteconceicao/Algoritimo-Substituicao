@@ -7,6 +7,8 @@ package visual;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -48,14 +50,20 @@ public class Propriedades extends javax.swing.JDialog {
 
         jLabel2.setText("Quantidade de Páginas");
         getContentPane().add(jLabel2);
+
+        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
         getContentPane().add(jFormattedTextField1);
 
         jLabel3.setText("Quantidade de Molduras");
         getContentPane().add(jLabel3);
+
+        jFormattedTextField2.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
         getContentPane().add(jFormattedTextField2);
 
         jLabel4.setText("Intervalo do relogio (segundos)");
         getContentPane().add(jLabel4);
+
+        jFormattedTextField3.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
         getContentPane().add(jFormattedTextField3);
 
         botaoConfirmar.setText("Confirmar");
@@ -71,11 +79,24 @@ public class Propriedades extends javax.swing.JDialog {
 
     private void botaoConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoConfirmarActionPerformed
         // TODO add your handling code here:
-        janelaPrincipal.setQuantPaginas(Integer.valueOf(jFormattedTextField1.getText()));
-        janelaPrincipal.setQuantMolduras(Integer.valueOf(jFormattedTextField2.getText()));
-        janelaPrincipal.setIntervaloRelogio(Integer.valueOf(jFormattedTextField3.getText()));
-        janelaPrincipal.inicializarMetodo();
-        this.dispose();
+        if (!jFormattedTextField1.getText().isEmpty() && !jFormattedTextField2.getText().isEmpty() && !jFormattedTextField3.getText().isEmpty()){
+            int quantPag = Integer.valueOf(jFormattedTextField1.getText());
+            int quantMold = Integer.valueOf(jFormattedTextField2.getText());
+            int intervaloRel = Integer.valueOf(jFormattedTextField3.getText());
+            if (quantPag > 0 && quantMold > 0 && intervaloRel > 0){
+                janelaPrincipal.setQuantPaginas(quantPag);
+                janelaPrincipal.setQuantMolduras(quantMold);
+                janelaPrincipal.setIntervaloRelogio(intervaloRel);
+                janelaPrincipal.inicializarMetodo();
+                this.dispose();
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Todos os campos devem ter valores maiores que 0.", "Erro!", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos.", "Erro!", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_botaoConfirmarActionPerformed
 
     /**
