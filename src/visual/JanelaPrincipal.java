@@ -7,7 +7,6 @@ package visual;
 
 import SubstituicaoPagina.Frame;
 import SubstituicaoPagina.Page;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -273,11 +272,6 @@ public class JanelaPrincipal extends javax.swing.JFrame {
             @Override
             public void run() {
                 tempo.setText("Tempo: " + (System.currentTimeMillis() - timerStart)/1000);
-            }
-        }, 0, 1000);
-        t.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
                 if (tabela != null && !listaPaginas.isEmpty()){
                     for (Page p : listaPaginas){
                         if (((System.currentTimeMillis() - timerStart)/1000) - p.getTempoUltimaRef() >= intervaloRelogio)
@@ -286,7 +280,7 @@ public class JanelaPrincipal extends javax.swing.JFrame {
                     atualizarTabela("relogio");
                 }
             }
-        }, 1000, 1000);
+        }, 0, 1000);
         criarTabela();
         criarMolduras();
         this.pack();
