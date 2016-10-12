@@ -5,8 +5,8 @@
  */
 package visual;
 
-import SubstituicaoPagina.Frame;
-import SubstituicaoPagina.Page;
+import representacoes.Frame;
+import representacoes.Page;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
